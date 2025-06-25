@@ -11,7 +11,14 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy existing app
+# Copy composer separately to leverage Docker cache
+COPY composer.lock composer.json ./
+
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Copy rest of the application
 COPY . .
 
 # Set permissions
